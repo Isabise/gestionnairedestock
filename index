@@ -1,0 +1,1068 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion Stock Pharmaceutique</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50, #34495e);
+            color: white;
+            padding: 25px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+
+        .tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 2px solid #dee2e6;
+        }
+
+        .tab {
+            flex: 1;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            background: #e9ecef;
+            border: none;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+            border-bottom: 3px solid #667eea;
+        }
+
+        .tab:hover:not(.active) {
+            background: #dee2e6;
+        }
+
+        .tab-content {
+            display: none;
+            padding: 30px;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .form-section {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .form-section h3 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 1.3em;
+            border-bottom: 2px solid #667eea;
+            padding-bottom: 10px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            margin-bottom: 5px;
+            color: #2c3e50;
+        }
+
+        .form-group input, .form-group select {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 5px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            margin: 5px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(231, 76, 60, 0.4);
+        }
+
+        .table-container {
+            overflow-x: auto;
+            margin-top: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+        }
+
+        tr:hover {
+            background: #f8f9fa;
+        }
+
+        .stock-low {
+            background: #ffe6e6 !important;
+            color: #d32f2f;
+        }
+
+        .expired {
+            background: #ffebee !important;
+            color: #c62828;
+            font-weight: bold;
+        }
+
+        .prescription-item {
+            background: #e3f2fd;
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #2196F3;
+        }
+
+        .prescription-summary {
+            background: #e8f5e8;
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+            border-left: 4px solid #4caf50;
+        }
+
+        .alert {
+            padding: 15px;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+
+        .alert-danger {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .search-bar {
+            padding: 10px;
+            border: 2px solid #dee2e6;
+            border-radius: 25px;
+            width: 100%;
+            max-width: 400px;
+            margin-bottom: 20px;
+            font-size: 16px;
+        }
+
+        .search-bar:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        /* Styles pour l'impression */
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            .prescription-print, .prescription-print * {
+                visibility: visible;
+            }
+            .prescription-print {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                padding: 20px;
+                font-family: Arial, sans-serif;
+                font-size: 12px;
+                line-height: 1.5;
+            }
+            .prescription-header {
+                text-align: center;
+                border-bottom: 2px solid #000;
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+            }
+            .prescription-header h2 {
+                margin: 0;
+                font-size: 18px;
+            }
+            .prescription-body {
+                margin-bottom: 30px;
+            }
+            .prescription-item-print {
+                margin: 15px 0;
+                padding: 10px;
+                border-left: 3px solid #667eea;
+                background: #f9f9f9;
+            }
+            .prescription-footer {
+                border-top: 1px solid #000;
+                padding-top: 15px;
+                margin-top: 30px;
+                font-size: 10px;
+                line-height: 1.4;
+            }
+            .mentions-legales {
+                background: #f0f0f0;
+                padding: 10px;
+                border: 1px solid #ccc;
+                margin-top: 15px;
+            }
+        }
+
+        .prescription-print {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏥 Gestion Stock Pharmaceutique</h1>
+            <p>Système de gestion d'inventaire et de prescriptions</p>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="showTab('stock')">📦 Gestion Stock</button>
+            <button class="tab" onclick="showTab('prescription')">📋 Prescriptions</button>
+            <button class="tab" onclick="showTab('traçabilite')">🔍 Traçabilité</button>
+            <button class="tab" onclick="showTab('stats')">📊 Statistiques</button>
+        </div>
+
+        <div id="stock" class="tab-content active">
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-number" id="totalProducts">0</div>
+                    <div>Produits en stock</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="lowStock">0</div>
+                    <div>Stock faible</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="expiredProducts">0</div>
+                    <div>Produits expirés</div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>➕ Ajouter un produit au stock</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nomProduit">Nom du produit *</label>
+                        <input type="text" id="nomProduit" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="fournisseur">Fournisseur *</label>
+                        <input type="text" id="fournisseur" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="datePeremption">Date de péremption *</label>
+                        <input type="date" id="datePeremption" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="numeroLot">Numéro de lot *</label>
+                        <input type="text" id="numeroLot" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="poids">Poids/Quantité (g) *</label>
+                        <input type="number" id="poids" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="seuilAlerte">Seuil d'alerte (g)</label>
+                        <input type="number" id="seuilAlerte" step="0.1" value="100">
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="ajouterProduit()">➕ Ajouter au stock</button>
+            </div>
+
+            <div class="form-section">
+                <h3>📦 Inventaire des produits</h3>
+                <input type="text" class="search-bar" placeholder="🔍 Rechercher un produit..." onkeyup="filtrerStock(this.value)">
+                <div class="table-container">
+                    <table id="tableStock">
+                        <thead>
+                            <tr>
+                                <th>Produit</th>
+                                <th>Fournisseur</th>
+                                <th>N° Lot</th>
+                                <th>Quantité (g)</th>
+                                <th>Date péremption</th>
+                                <th>Statut</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="prescription" class="tab-content">
+            <div class="form-section">
+                <h3>👤 Informations patient</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="nomPatient">Nom du patient *</label>
+                        <input type="text" id="nomPatient" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adressePatient">Adresse *</label>
+                        <input type="text" id="adressePatient" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="dateRemise">Date de remise *</label>
+                        <input type="date" id="dateRemise" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>💊 Ajouter un produit à la prescription</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="produitPrescrit">Produit *</label>
+                        <select id="produitPrescrit" required>
+                            <option value="">Sélectionner un produit</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="quantitePrescrite">Quantité prescrite (g) *</label>
+                        <input type="number" id="quantitePrescrite" step="0.1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="formeProduit">Forme *</label>
+                        <select id="formeProduit" required>
+                            <option value="">Sélectionner une forme</option>
+                            <option value="tisane">Tisane</option>
+                            <option value="gélules">Gélules</option>
+                            <option value="poudre">Poudre</option>
+                            <option value="extrait">Extrait</option>
+                            <option value="teinture">Teinture</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" onclick="ajouterProduitPrescription()">➕ Ajouter à la prescription</button>
+            </div>
+
+            <div id="prescriptionCourante" class="form-section" style="display: none;">
+                <h3>📋 Prescription en cours</h3>
+                <div id="listeProduitsPrescription"></div>
+                <div class="prescription-summary" id="resumePrescription"></div>
+                <button class="btn btn-primary" onclick="finaliserPrescription()">✅ Finaliser la prescription</button>
+                <button class="btn btn-danger" onclick="annulerPrescription()">❌ Annuler</button>
+            </div>
+
+            <div class="form-section">
+                <h3>📜 Historique des prescriptions</h3>
+                <input type="text" class="search-bar" placeholder="🔍 Rechercher une prescription..." onkeyup="filtrerPrescriptions(this.value)">
+                <div class="table-container">
+                    <table id="tablePrescriptions">
+                        <thead>
+                            <tr>
+                                <th>N° Prescription</th>
+                                <th>Patient</th>
+                                <th>Date</th>
+                                <th>Produits</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="traçabilite" class="tab-content">
+            <div class="form-section">
+                <h3>🔍 Traçabilité des lots</h3>
+                <div class="form-group">
+                    <label for="rechercherLot">Rechercher par numéro de lot</label>
+                    <input type="text" id="rechercherLot" placeholder="Entrer le numéro de lot" onkeyup="rechercherParLot(this.value)">
+                </div>
+                <div id="resultatsTracabilite"></div>
+            </div>
+        </div>
+
+        <div id="stats" class="tab-content">
+            <div class="form-section">
+                <h3>📊 Statistiques détaillées</h3>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-number" id="totalPrescriptions">0</div>
+                        <div>Total prescriptions</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="produitsUtilises">0</div>
+                        <div>Produits utilisés (g)</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-number" id="fournisseursActifs">0</div>
+                        <div>Fournisseurs actifs</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Zone d'impression cachée -->
+    <div id="prescriptionPrint" class="prescription-print"></div>
+
+    <script>
+        // Variables globales
+        let stock = [];
+        let prescriptions = [];
+        let prescriptionCourante = {
+            patient: '',
+            adresse: '',
+            date: '',
+            produits: [],
+            numeroLots: []
+        };
+        let compteurPrescription = 1;
+
+        // Chargement des données depuis le localStorage
+        function chargerDonnees() {
+            const stockSauve = localStorage.getItem('stock');
+            const prescriptionsSauvees = localStorage.getItem('prescriptions');
+            const compteurSauve = localStorage.getItem('compteurPrescription');
+            
+            if (stockSauve) stock = JSON.parse(stockSauve);
+            if (prescriptionsSauvees) prescriptions = JSON.parse(prescriptionsSauvees);
+            if (compteurSauve) compteurPrescription = parseInt(compteurSauve);
+            
+            afficherStock();
+            afficherPrescriptions();
+            mettreAJourStats();
+            mettreAJourSelectProduits();
+        }
+
+        // Sauvegarde des données
+        function sauvegarderDonnees() {
+            localStorage.setItem('stock', JSON.stringify(stock));
+            localStorage.setItem('prescriptions', JSON.stringify(prescriptions));
+            localStorage.setItem('compteurPrescription', compteurPrescription.toString());
+        }
+
+        // Gestion des onglets
+        function showTab(tabName) {
+            document.querySelectorAll('.tab').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            
+            event.target.classList.add('active');
+            document.getElementById(tabName).classList.add('active');
+        }
+
+        // Ajouter un produit au stock
+        function ajouterProduit() {
+            const nom = document.getElementById('nomProduit').value;
+            const fournisseur = document.getElementById('fournisseur').value;
+            const datePeremption = document.getElementById('datePeremption').value;
+            const numeroLot = document.getElementById('numeroLot').value;
+            const poids = parseFloat(document.getElementById('poids').value);
+            const seuilAlerte = parseFloat(document.getElementById('seuilAlerte').value) || 100;
+
+            if (!nom || !fournisseur || !datePeremption || !numeroLot || !poids) {
+                alert('⚠️ Veuillez remplir tous les champs obligatoires');
+                return;
+            }
+
+            // Vérifier si le lot existe déjà
+            if (stock.find(p => p.numeroLot === numeroLot)) {
+                alert('⚠️ Ce numéro de lot existe déjà dans le stock');
+                return;
+            }
+
+            const produit = {
+                id: Date.now(),
+                nom,
+                fournisseur,
+                datePeremption,
+                numeroLot,
+                poids,
+                poidsInitial: poids,
+                seuilAlerte,
+                dateAjout: new Date().toISOString()
+            };
+
+            stock.push(produit);
+            sauvegarderDonnees();
+            afficherStock();
+            mettreAJourStats();
+            mettreAJourSelectProduits();
+
+            // Réinitialiser le formulaire
+            document.getElementById('nomProduit').value = '';
+            document.getElementById('fournisseur').value = '';
+            document.getElementById('datePeremption').value = '';
+            document.getElementById('numeroLot').value = '';
+            document.getElementById('poids').value = '';
+            document.getElementById('seuilAlerte').value = '100';
+
+            alert('✅ Produit ajouté avec succès au stock');
+        }
+
+        // Afficher le stock
+        function afficherStock() {
+            const tbody = document.querySelector('#tableStock tbody');
+            tbody.innerHTML = '';
+
+            stock.forEach(produit => {
+                const row = tbody.insertRow();
+                const datePeremption = new Date(produit.datePeremption);
+                const maintenant = new Date();
+                const estExpire = datePeremption < maintenant;
+                const stockFaible = produit.poids <= produit.seuilAlerte;
+
+                let statut = '✅ OK';
+                let classeCSS = '';
+
+                if (estExpire) {
+                    statut = '⚠️ Expiré';
+                    classeCSS = 'expired';
+                } else if (stockFaible) {
+                    statut = '⚡ Stock faible';
+                    classeCSS = 'stock-low';
+                }
+
+                row.className = classeCSS;
+                row.innerHTML = `
+                    <td>${produit.nom}</td>
+                    <td>${produit.fournisseur}</td>
+                    <td>${produit.numeroLot}</td>
+                    <td>${produit.poids.toFixed(1)}g</td>
+                    <td>${new Date(produit.datePeremption).toLocaleDateString()}</td>
+                    <td>${statut}</td>
+                    <td>
+                        <button class="btn btn-danger" onclick="supprimerProduit(${produit.id})">🗑️</button>
+                    </td>
+                `;
+            });
+        }
+
+        // Supprimer un produit
+        function supprimerProduit(id) {
+            if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+                stock = stock.filter(p => p.id !== id);
+                sauvegarderDonnees();
+                afficherStock();
+                mettreAJourStats();
+                mettreAJourSelectProduits();
+                alert('✅ Produit supprimé');
+            }
+        }
+
+        // Mettre à jour le select des produits pour prescription
+        function mettreAJourSelectProduits() {
+            const select = document.getElementById('produitPrescrit');
+            select.innerHTML = '<option value="">Sélectionner un produit</option>';
+            
+            stock.forEach(produit => {
+                if (produit.poids > 0) {
+                    const option = document.createElement('option');
+                    option.value = produit.id;
+                    option.textContent = `${produit.nom} (${produit.poids.toFixed(1)}g disponible)`;
+                    select.appendChild(option);
+                }
+            });
+        }
+
+        // Ajouter un produit à la prescription courante
+        function ajouterProduitPrescription() {
+            const produitId = parseInt(document.getElementById('produitPrescrit').value);
+            const quantite = parseFloat(document.getElementById('quantitePrescrite').value);
+            const forme = document.getElementById('formeProduit').value;
+            const nomPatient = document.getElementById('nomPatient').value;
+            const adressePatient = document.getElementById('adressePatient').value;
+            const dateRemise = document.getElementById('dateRemise').value;
+
+            if (!produitId || !quantite || !forme || !nomPatient || !adressePatient || !dateRemise) {
+                alert('⚠️ Veuillez remplir tous les champs');
+                return;
+            }
+
+            const produit = stock.find(p => p.id === produitId);
+            if (!produit) {
+                alert('⚠️ Produit non trouvé');
+                return;
+            }
+
+            if (quantite > produit.poids) {
+                alert(`⚠️ Quantité insuffisante en stock (${produit.poids.toFixed(1)}g disponible)`);
+                return;
+            }
+
+            // Mettre à jour les informations patient si c'est le premier produit
+            if (prescriptionCourante.produits.length === 0) {
+                prescriptionCourante.patient = nomPatient;
+                prescriptionCourante.adresse = adressePatient;
+                prescriptionCourante.date = dateRemise;
+            }
+
+            const produitPrescrit = {
+                id: produit.id,
+                nom: produit.nom,
+                numeroLot: produit.numeroLot,
+                quantite: quantite,
+                forme: forme
+            };
+
+            prescriptionCourante.produits.push(produitPrescrit);
+            if (!prescriptionCourante.numeroLots.includes(produit.numeroLot)) {
+                prescriptionCourante.numeroLots.push(produit.numeroLot);
+            }
+
+            afficherPrescriptionCourante();
+
+            // Réinitialiser les champs produit
+            document.getElementById('produitPrescrit').value = '';
+            document.getElementById('quantitePrescrite').value = '';
+            document.getElementById('formeProduit').value = '';
+        }
+
+        // Afficher la prescription courante
+        function afficherPrescriptionCourante() {
+            const section = document.getElementById('prescriptionCourante');
+            const liste = document.getElementById('listeProduitsPrescription');
+            const resume = document.getElementById('resumePrescription');
+
+            if (prescriptionCourante.produits.length === 0) {
+                section.style.display = 'none';
+                return;
+            }
+
+            section.style.display = 'block';
+
+            // Afficher la liste des produits
+            liste.innerHTML = '';
+            prescriptionCourante.produits.forEach((produit, index) => {
+                const div = document.createElement('div');
+                div.className = 'prescription-item';
+                div.innerHTML = `
+                    <strong>${produit.nom}</strong> - ${produit.quantite.toFixed(1)}g - ${produit.forme}
+                    <br><small>Lot: ${produit.numeroLot}</small>
+                    <button class="btn btn-danger" style="float: right;" onclick="retirerProduitPrescription(${index})">🗑️</button>
+                `;
+                liste.appendChild(div);
+            });
+
+            // Afficher le résumé
+            const totalQuantite = prescriptionCourante.produits.reduce((sum, p) => sum + p.quantite, 0);
+            resume.innerHTML = `
+                <h4>📋 Résumé de la prescription</h4>
+                <p><strong>Patient:</strong> ${prescriptionCourante.patient}</p>
+                <p><strong>Adresse:</strong> ${prescriptionCourante.adresse}</p>
+                <p><strong>Date:</strong> ${new Date(prescriptionCourante.date).toLocaleDateString()}</p>
+                <p><strong>Total produits:</strong> ${prescriptionCourante.produits.length}</p>
+                <p><strong>Quantité totale:</strong> ${totalQuantite.toFixed(1)}g</p>
+                <p><strong>Lots utilisés:</strong> ${prescriptionCourante.numeroLots.join(', ')}</p>
+            `;
+        }
+
+        // Retirer un produit de la prescription courante
+        function retirerProduitPrescription(index) {
+            prescriptionCourante.produits.splice(index, 1);
+            
+            // Recalculer les numéros de lots
+            prescriptionCourante.numeroLots = [...new Set(prescriptionCourante.produits.map(p => p.numeroLot))];
+            
+            if (prescriptionCourante.produits.length === 0) {
+                prescriptionCourante = { patient: '', adresse: '', date: '', produits: [], numeroLots: [] };
+            }
+            
+            afficherPrescriptionCourante();
+        }
+
+        // Finaliser la prescription
+        function finaliserPrescription() {
+            if (prescriptionCourante.produits.length === 0) {
+                alert('⚠️ Aucun produit dans la prescription');
+                return;
+            }
+
+            // Décompter du stock
+            prescriptionCourante.produits.forEach(produitPrescrit => {
+                const produitStock = stock.find(p => p.id === produitPrescrit.id);
+                if (produitStock) {
+                    produitStock.poids -= produitPrescrit.quantite;
+                }
+            });
+
+            // Créer la prescription finale
+            const prescription = {
+                numero: compteurPrescription++,
+                patient: prescriptionCourante.patient,
+                adresse: prescriptionCourante.adresse,
+                date: prescriptionCourante.date,
+                dateCreation: new Date().toISOString(),
+                produits: [...prescriptionCourante.produits],
+                numeroLots: [...prescriptionCourante.numeroLots]
+            };
+
+            prescriptions.push(prescription);
+
+            // Réinitialiser
+            prescriptionCourante = { patient: '', adresse: '', date: '', produits: [], numeroLots: [] };
+
+            // Sauvegarder et mettre à jour l'affichage
+            sauvegarderDonnees();
+            afficherStock();
+            afficherPrescriptions();
+            afficherPrescriptionCourante();
+            mettreAJourStats();
+            mettreAJourSelectProduits();
+
+            // Réinitialiser le formulaire
+            document.getElementById('nomPatient').value = '';
+            document.getElementById('adressePatient').value = '';
+            document.getElementById('dateRemise').value = '';
+
+            alert(`✅ Prescription n°${prescription.numero} créée avec succès !`);
+        }
+
+        // Annuler la prescription courante
+        function annulerPrescription() {
+            if (confirm('⚠️ Êtes-vous sûr de vouloir annuler cette prescription ?')) {
+                prescriptionCourante = { patient: '', adresse: '', date: '', produits: [], numeroLots: [] };
+                afficherPrescriptionCourante();
+            }
+        }
+
+        // Afficher les prescriptions
+        function afficherPrescriptions() {
+            const tbody = document.querySelector('#tablePrescriptions tbody');
+            tbody.innerHTML = '';
+
+            prescriptions.slice().reverse().forEach(prescription => {
+                const row = tbody.insertRow();
+                const produitsList = prescription.produits.map(p => 
+                    `${p.nom} (${p.quantite.toFixed(1)}g - ${p.forme})`
+                ).join(', ');
+
+                row.innerHTML = `
+                    <td>P${prescription.numero.toString().padStart(4, '0')}</td>
+                    <td>${prescription.patient}</td>
+                    <td>${new Date(prescription.date).toLocaleDateString()}</td>
+                    <td>${produitsList}</td>
+                    <td>
+                        <button class="btn btn-primary" onclick="voirDetailsPrescription(${prescription.numero})">👁️ Détails</button>
+                        <button class="btn btn-primary" onclick="imprimerPrescription(${prescription.numero})">🖨️ Imprimer</button>
+                    </td>
+                `;
+            });
+        }
+
+        // Voir les détails d'une prescription
+        function voirDetailsPrescription(numero) {
+            const prescription = prescriptions.find(p => p.numero === numero);
+            if (!prescription) return;
+
+            const produitsList = prescription.produits.map(p => 
+                `• ${p.nom}: ${p.quantite.toFixed(1)}g (${p.forme}) - Lot: ${p.numeroLot}`
+            ).join('\n');
+
+            alert(`📋 Prescription P${numero.toString().padStart(4, '0')}
+            
+👤 Patient: ${prescription.patient}
+📍 Adresse: ${prescription.adresse}
+📅 Date: ${new Date(prescription.date).toLocaleDateString()}
+
+💊 Produits prescrits:
+${produitsList}
+
+🔍 Lots utilisés: ${prescription.numeroLots.join(', ')}`);
+        }
+
+        // Imprimer une prescription
+        function imprimerPrescription(numero) {
+            const prescription = prescriptions.find(p => p.numero === numero);
+            if (!prescription) return;
+
+            const dateRemise = new Date(prescription.date).toLocaleDateString('fr-CH');
+            const dateLimite = new Date();
+            dateLimite.setFullYear(dateLimite.getFullYear() + 2);
+            const dateLimiteStr = dateLimite.toLocaleDateString('fr-CH');
+
+            const produitsList = prescription.produits.map(p => `
+                <div class="prescription-item-print">
+                    <strong>${p.nom}</strong><br>
+                    <strong>Posologie:</strong> ${p.quantite.toFixed(1)}g - Forme: ${p.forme}<br>
+                    <strong>Numéro de lot:</strong> ${p.numeroLot}<br>
+                    <em>Complément alimentaire à base de plantes</em>
+                </div>
+            `).join('');
+
+            const printContent = `
+                <div class="prescription-header">
+                    <h2>🌿 PRESCRIPTION PHYTOTHÉRAPIE</h2>
+                    <p>Prescription n° P${numero.toString().padStart(4, '0')}</p>
+                </div>
+
+                <div class="prescription-body">
+                    <p><strong>Patient:</strong> ${prescription.patient}</p>
+                    <p><strong>Adresse:</strong> ${prescription.adresse}</p>
+                    <p><strong>Date de remise:</strong> ${dateRemise}</p>
+                    <hr>
+                    
+                    <h3>Produits prescrits:</h3>
+                    ${produitsList}
+                </div>
+
+                <div class="prescription-footer">
+                    <div class="mentions-legales">
+                        <h4>⚠️ MENTIONS IMPORTANTES</h4>
+                        <p>• <strong>Complément alimentaire à base de plantes</strong></p>
+                        <p>• <strong>Conservation:</strong> Conserver dans un endroit propre et aéré</p>
+                        <p>• <strong>Stockage:</strong> Ne pas exposer au soleil</p>
+                        <p>• <strong>Sécurité:</strong> Tenir éloigné de la portée des enfants</p>
+                        <p>• <strong>Date limite de conservation:</strong> ${dateLimiteStr}</p>
+                        <p>• <strong>Lots utilisés:</strong> ${prescription.numeroLots.join(', ')}</p>
+                    </div>
+                    
+                    <br>
+                    <p><em>Document généré le ${new Date().toLocaleString('fr-CH')}</em></p>
+                </div>
+            `;
+
+            const printDiv = document.getElementById('prescriptionPrint');
+            printDiv.innerHTML = printContent;
+            printDiv.style.display = 'block';
+
+            // Imprimer
+            window.print();
+
+            // Cacher après impression
+            setTimeout(() => {
+                printDiv.style.display = 'none';
+            }, 1000);
+        }
+
+        // Filtrer le stock
+        function filtrerStock(terme) {
+            const rows = document.querySelectorAll('#tableStock tbody tr');
+            rows.forEach(row => {
+                const texte = row.textContent.toLowerCase();
+                row.style.display = texte.includes(terme.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        // Filtrer les prescriptions
+        function filtrerPrescriptions(terme) {
+            const rows = document.querySelectorAll('#tablePrescriptions tbody tr');
+            rows.forEach(row => {
+                const texte = row.textContent.toLowerCase();
+                row.style.display = texte.includes(terme.toLowerCase()) ? '' : 'none';
+            });
+        }
+
+        // Rechercher par numéro de lot
+        function rechercherParLot(numeroLot) {
+            const resultats = document.getElementById('resultatsTracabilite');
+            
+            if (!numeroLot) {
+                resultats.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // Chercher dans le stock actuel
+            const produitStock = stock.find(p => p.numeroLot.toLowerCase().includes(numeroLot.toLowerCase()));
+            if (produitStock) {
+                html += `
+                    <div class="prescription-item">
+                        <h4>📦 En stock</h4>
+                        <p><strong>Produit:</strong> ${produitStock.nom}</p>
+                        <p><strong>Fournisseur:</strong> ${produitStock.fournisseur}</p>
+                        <p><strong>Quantité restante:</strong> ${produitStock.poids.toFixed(1)}g</p>
+                        <p><strong>Date péremption:</strong> ${new Date(produitStock.datePeremption).toLocaleDateString()}</p>
+                        <p><strong>Date ajout:</strong> ${new Date(produitStock.dateAjout).toLocaleDateString()}</p>
+                    </div>
+                `;
+            }
+
+            // Chercher dans les prescriptions
+            const prescriptionsAvecLot = prescriptions.filter(p => 
+                p.numeroLots.some(lot => lot.toLowerCase().includes(numeroLot.toLowerCase()))
+            );
+
+            if (prescriptionsAvecLot.length > 0) {
+                html += '<h4>📋 Utilisé dans les prescriptions:</h4>';
+                prescriptionsAvecLot.forEach(prescription => {
+                    const produitsAvecLot = prescription.produits.filter(p => 
+                        p.numeroLot.toLowerCase().includes(numeroLot.toLowerCase())
+                    );
+                    
+                    produitsAvecLot.forEach(produit => {
+                        html += `
+                            <div class="prescription-item">
+                                <p><strong>Prescription:</strong> P${prescription.numero.toString().padStart(4, '0')}</p>
+                                <p><strong>Patient:</strong> ${prescription.patient}</p>
+                                <p><strong>Date:</strong> ${new Date(prescription.date).toLocaleDateString()}</p>
+                                <p><strong>Produit:</strong> ${produit.nom}</p>
+                                <p><strong>Quantité utilisée:</strong> ${produit.quantite.toFixed(1)}g</p>
+                                <p><strong>Forme:</strong> ${produit.forme}</p>
+                            </div>
+                        `;
+                    });
+                });
+            }
+
+            if (!html) {
+                html = '<p>🔍 Aucun résultat trouvé pour ce numéro de lot</p>';
+            }
+
+            resultats.innerHTML = html;
+        }
+
+        // Mettre à jour les statistiques
+        function mettreAJourStats() {
+            const maintenant = new Date();
+            
+            // Stats stock
+            const totalProduits = stock.length;
+            const stockFaible = stock.filter(p => p.poids <= p.seuilAlerte).length;
+            const produitExpires = stock.filter(p => new Date(p.datePeremption) < maintenant).length;
+            
+            document.getElementById('totalProducts').textContent = totalProduits;
+            document.getElementById('lowStock').textContent = stockFaible;
+            document.getElementById('expiredProducts').textContent = produitExpires;
+
+            // Stats prescriptions
+            const totalPrescriptions = prescriptions.length;
+            const totalUtilise = prescriptions.reduce((sum, p) => 
+                sum + p.produits.reduce((pSum, prod) => pSum + prod.quantite, 0), 0
+            );
+            const fournisseursUniques = [...new Set(stock.map(p => p.fournisseur))].length;
+
+            document.getElementById('totalPrescriptions').textContent = totalPrescriptions;
+            document.getElementById('produitsUtilises').textContent = totalUtilise.toFixed(1);
+            document.getElementById('fournisseursActifs').textContent = fournisseursUniques;
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', function() {
+            // Définir la date par défaut à aujourd'hui
+            document.getElementById('dateRemise').valueAsDate = new Date();
+            
+            chargerDonnees();
+        });
+    </script>
+</body>
+</html>
