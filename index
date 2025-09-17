@@ -334,15 +334,15 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>GESTION STOCK PHARMACEUTIQUE</h1>
+            <h1>Gestion Stock Pharmaceutique</h1>
             <p>Système de gestion d'inventaire et de prescriptions</p>
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="showTab('stock')">GESTION STOCK</button>
-            <button class="tab" onclick="showTab('prescription')">PRESCRIPTIONS</button>
-            <button class="tab" onclick="showTab('tracabilite')">TRACABILITE</button>
-            <button class="tab" onclick="showTab('stats')">STATISTIQUES</button>
+            <button class="tab active" onclick="showTab('stock')">📦 Gestion Stock</button>
+            <button class="tab" onclick="showTab('prescription')">📋 Prescriptions</button>
+            <button class="tab" onclick="showTab('traçabilite')">🔍 Traçabilité</button>
+            <button class="tab" onclick="showTab('stats')">📊 Statistiques</button>
         </div>
 
         <div id="stock" class="tab-content active">
@@ -362,7 +362,7 @@
             </div>
 
             <div class="form-section">
-                <h3>AJOUTER UN PRODUIT AU STOCK</h3>
+                <h3>+Ajouter un produit au stock</h3>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="nomProduit">Nom du produit *</label>
@@ -389,11 +389,11 @@
                         <input type="number" id="seuilAlerte" step="0.1" value="100">
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="ajouterProduit()">AJOUTER AU STOCK</button>
+                <button class="btn btn-primary" onclick="ajouterProduit()">+ Ajouter au stock</button>
             </div>
 
             <div class="form-section">
-                <h3>INVENTAIRE DES PRODUITS</h3>
+                <h3>Inventaire des produits</h3>
                 <input type="text" class="search-bar" placeholder="Rechercher un produit..." onkeyup="filtrerStock(this.value)">
                 <div class="table-container">
                     <table id="tableStock">
@@ -416,7 +416,7 @@
 
         <div id="prescription" class="tab-content">
             <div class="form-section">
-                <h3>INFORMATIONS PATIENT</h3>
+                <h3>👤 Informations patient</h3>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="nomPatient">Nom du patient *</label>
@@ -434,7 +434,7 @@
             </div>
 
             <div class="form-section">
-                <h3>AJOUTER UN PRODUIT A LA PRESCRIPTION</h3>
+                <h3>Ajouter un produit à la prescription</h3>
                 <div class="form-grid">
                     <div class="form-group">
                         <label for="produitPrescrit">Produit *</label>
@@ -458,19 +458,19 @@
                         </select>
                     </div>
                 </div>
-                <button class="btn btn-primary" onclick="ajouterProduitPrescription()">AJOUTER A LA PRESCRIPTION</button>
+                <button class="btn btn-primary" onclick="ajouterProduitPrescription()">+Ajouter à la prescription</button>
             </div>
 
             <div id="prescriptionCourante" class="form-section" style="display: none;">
-                <h3>PRESCRIPTION EN COURS</h3>
+                <h3> Prescription en cours</h3>
                 <div id="listeProduitsPrescription"></div>
                 <div class="prescription-summary" id="resumePrescription"></div>
-                <button class="btn btn-primary" onclick="finaliserPrescription()">FINALISER LA PRESCRIPTION</button>
-                <button class="btn btn-danger" onclick="annulerPrescription()">ANNULER</button>
+                <button class="btn btn-primary" onclick="finaliserPrescription()">✅ Finaliser la prescription</button>
+                <button class="btn btn-danger" onclick="annulerPrescription()">❌ Annuler</button>
             </div>
 
             <div class="form-section">
-                <h3>HISTORIQUE DES PRESCRIPTIONS</h3>
+                <h3>Historique des prescriptions</h3>
                 <input type="text" class="search-bar" placeholder="Rechercher une prescription..." onkeyup="filtrerPrescriptions(this.value)">
                 <div class="table-container">
                     <table id="tablePrescriptions">
@@ -489,9 +489,9 @@
             </div>
         </div>
 
-        <div id="tracabilite" class="tab-content">
+        <div id="traçabilite" class="tab-content">
             <div class="form-section">
-                <h3>TRACABILITE DES LOTS</h3>
+                <h3>🔍 Traçabilité des lots</h3>
                 <div class="form-group">
                     <label for="rechercherLot">Rechercher par numéro de lot</label>
                     <input type="text" id="rechercherLot" placeholder="Entrer le numéro de lot" onkeyup="rechercherParLot(this.value)">
@@ -502,7 +502,7 @@
 
         <div id="stats" class="tab-content">
             <div class="form-section">
-                <h3>STATISTIQUES DETAILLEES</h3>
+                <h3>Statistiques détaillées</h3>
                 <div class="stats-grid">
                     <div class="stat-card">
                         <div class="stat-number" id="totalPrescriptions">0</div>
@@ -579,13 +579,13 @@
             const seuilAlerte = parseFloat(document.getElementById('seuilAlerte').value) || 100;
 
             if (!nom || !fournisseur || !datePeremption || !numeroLot || !poids) {
-                alert('Veuillez remplir tous les champs obligatoires');
+                alert('⚠️ Veuillez remplir tous les champs obligatoires');
                 return;
             }
 
             // Vérifier si le lot existe déjà
             if (stock.find(p => p.numeroLot === numeroLot)) {
-                alert('Ce numéro de lot existe déjà dans le stock');
+                alert('⚠️ Ce numéro de lot existe déjà dans le stock');
                 return;
             }
 
@@ -615,7 +615,7 @@
             document.getElementById('poids').value = '';
             document.getElementById('seuilAlerte').value = '100';
 
-            alert('Produit ajouté avec succès au stock');
+            alert('✅ Produit ajouté avec succès au stock');
         }
 
         // Afficher le stock
@@ -630,14 +630,14 @@
                 const estExpire = datePeremption < maintenant;
                 const stockFaible = produit.poids <= produit.seuilAlerte;
 
-                let statut = 'OK';
+                let statut = '✅ OK';
                 let classeCSS = '';
 
                 if (estExpire) {
-                    statut = 'EXPIRE';
+                    statut = '⚠️ Expiré';
                     classeCSS = 'expired';
                 } else if (stockFaible) {
-                    statut = 'STOCK FAIBLE';
+                    statut = '⚡ Stock faible';
                     classeCSS = 'stock-low';
                 }
 
@@ -650,7 +650,7 @@
                     <td>${new Date(produit.datePeremption).toLocaleDateString()}</td>
                     <td>${statut}</td>
                     <td>
-                        <button class="btn btn-danger" onclick="supprimerProduit(${produit.id})">SUPPRIMER</button>
+                        <button class="btn btn-danger" onclick="supprimerProduit(${produit.id})">🗑️</button>
                     </td>
                 `;
             });
@@ -658,13 +658,13 @@
 
         // Supprimer un produit
         function supprimerProduit(id) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer ce produit ?')) {
+            if (confirm('⚠️ Êtes-vous sûr de vouloir supprimer ce produit ?')) {
                 stock = stock.filter(p => p.id !== id);
                 sauvegarderDonnees();
                 afficherStock();
                 mettreAJourStats();
                 mettreAJourSelectProduits();
-                alert('Produit supprimé');
+                alert('✅ Produit supprimé');
             }
         }
 
@@ -693,18 +693,18 @@
             const dateRemise = document.getElementById('dateRemise').value;
 
             if (!produitId || !quantite || !forme || !nomPatient || !adressePatient || !dateRemise) {
-                alert('Veuillez remplir tous les champs');
+                alert('⚠️ Veuillez remplir tous les champs');
                 return;
             }
 
             const produit = stock.find(p => p.id === produitId);
             if (!produit) {
-                alert('Produit non trouvé');
+                alert('⚠️ Produit non trouvé');
                 return;
             }
 
             if (quantite > produit.poids) {
-                alert(`Quantité insuffisante en stock (${produit.poids.toFixed(1)}g disponible)`);
+                alert(`⚠️ Quantité insuffisante en stock (${produit.poids.toFixed(1)}g disponible)`);
                 return;
             }
 
@@ -757,7 +757,7 @@
                 div.innerHTML = `
                     <strong>${produit.nom}</strong> - ${produit.quantite.toFixed(1)}g - ${produit.forme}
                     <br><small>Lot: ${produit.numeroLot}</small>
-                    <button class="btn btn-danger" style="float: right;" onclick="retirerProduitPrescription(${index})">RETIRER</button>
+                    <button class="btn btn-danger" style="float: right;" onclick="retirerProduitPrescription(${index})">🗑️</button>
                 `;
                 liste.appendChild(div);
             });
@@ -765,7 +765,7 @@
             // Afficher le résumé
             const totalQuantite = prescriptionCourante.produits.reduce((sum, p) => sum + p.quantite, 0);
             resume.innerHTML = `
-                <h4>RESUME DE LA PRESCRIPTION</h4>
+                <h4>📋 Résumé de la prescription</h4>
                 <p><strong>Patient:</strong> ${prescriptionCourante.patient}</p>
                 <p><strong>Adresse:</strong> ${prescriptionCourante.adresse}</p>
                 <p><strong>Date:</strong> ${new Date(prescriptionCourante.date).toLocaleDateString()}</p>
@@ -792,7 +792,7 @@
         // Finaliser la prescription
         function finaliserPrescription() {
             if (prescriptionCourante.produits.length === 0) {
-                alert('Aucun produit dans la prescription');
+                alert('⚠️ Aucun produit dans la prescription');
                 return;
             }
 
@@ -833,12 +833,12 @@
             document.getElementById('adressePatient').value = '';
             document.getElementById('dateRemise').value = '';
 
-            alert(`Prescription n°${prescription.numero} créée avec succès !`);
+            alert(`✅ Prescription n°${prescription.numero} créée avec succès !`);
         }
 
         // Annuler la prescription courante
         function annulerPrescription() {
-            if (confirm('Êtes-vous sûr de vouloir annuler cette prescription ?')) {
+            if (confirm('⚠️ Êtes-vous sûr de vouloir annuler cette prescription ?')) {
                 prescriptionCourante = { patient: '', adresse: '', date: '', produits: [], numeroLots: [] };
                 afficherPrescriptionCourante();
             }
@@ -861,8 +861,8 @@
                     <td>${new Date(prescription.date).toLocaleDateString()}</td>
                     <td>${produitsList}</td>
                     <td>
-                        <button class="btn btn-primary" onclick="voirDetailsPrescription(${prescription.numero})">DETAILS</button>
-                        <button class="btn btn-primary" onclick="imprimerPrescription(${prescription.numero})">IMPRIMER</button>
+                        <button class="btn btn-primary" onclick="voirDetailsPrescription(${prescription.numero})">👁️ Détails</button>
+                        <button class="btn btn-primary" onclick="imprimerPrescription(${prescription.numero})">🖨️ Imprimer</button>
                     </td>
                 `;
             });
@@ -877,16 +877,16 @@
                 `• ${p.nom}: ${p.quantite.toFixed(1)}g (${p.forme}) - Lot: ${p.numeroLot}`
             ).join('\n');
 
-            alert(`Prescription P${numero.toString().padStart(4, '0')}
+            alert(`📋 Prescription P${numero.toString().padStart(4, '0')}
             
-Patient: ${prescription.patient}
-Adresse: ${prescription.adresse}
-Date: ${new Date(prescription.date).toLocaleDateString()}
+👤 Patient: ${prescription.patient}
+📍 Adresse: ${prescription.adresse}
+📅 Date: ${new Date(prescription.date).toLocaleDateString()}
 
-Produits prescrits:
+💊 Produits prescrits:
 ${produitsList}
 
-Lots utilisés: ${prescription.numeroLots.join(', ')}`);
+🔍 Lots utilisés: ${prescription.numeroLots.join(', ')}`);
         }
 
         // Imprimer une prescription
@@ -910,7 +910,7 @@ Lots utilisés: ${prescription.numeroLots.join(', ')}`);
 
             const printContent = `
                 <div class="prescription-header">
-                    <h2>PRESCRIPTION PHYTOTHERAPIE</h2>
+                    <h2>🌿 PRESCRIPTION PHYTOTHÉRAPIE</h2>
                     <p>Prescription n° P${numero.toString().padStart(4, '0')}</p>
                 </div>
 
@@ -926,7 +926,7 @@ Lots utilisés: ${prescription.numeroLots.join(', ')}`);
 
                 <div class="prescription-footer">
                     <div class="mentions-legales">
-                        <h4>MENTIONS IMPORTANTES</h4>
+                        <h4>⚠️ MENTIONS IMPORTANTES</h4>
                         <p>• <strong>Complément alimentaire à base de plantes</strong></p>
                         <p>• <strong>Conservation:</strong> Conserver dans un endroit propre et aéré</p>
                         <p>• <strong>Stockage:</strong> Ne pas exposer au soleil</p>
@@ -987,7 +987,7 @@ Lots utilisés: ${prescription.numeroLots.join(', ')}`);
             if (produitStock) {
                 html += `
                     <div class="prescription-item">
-                        <h4>EN STOCK</h4>
+                        <h4>📦 En stock</h4>
                         <p><strong>Produit:</strong> ${produitStock.nom}</p>
                         <p><strong>Fournisseur:</strong> ${produitStock.fournisseur}</p>
                         <p><strong>Quantité restante:</strong> ${produitStock.poids.toFixed(1)}g</p>
@@ -1003,7 +1003,7 @@ Lots utilisés: ${prescription.numeroLots.join(', ')}`);
             );
 
             if (prescriptionsAvecLot.length > 0) {
-                html += '<h4>UTILISE DANS LES PRESCRIPTIONS:</h4>';
+                html += '<h4>📋 Utilisé dans les prescriptions:</h4>';
                 prescriptionsAvecLot.forEach(prescription => {
                     const produitsAvecLot = prescription.produits.filter(p => 
                         p.numeroLot.toLowerCase().includes(numeroLot.toLowerCase())
@@ -1025,7 +1025,7 @@ Lots utilisés: ${prescription.numeroLots.join(', ')}`);
             }
 
             if (!html) {
-                html = '<p>Aucun résultat trouvé pour ce numéro de lot</p>';
+                html = '<p>🔍 Aucun résultat trouvé pour ce numéro de lot</p>';
             }
 
             resultats.innerHTML = html;
@@ -1065,4 +1065,4 @@ Lots utilisés: ${prescription.numeroLots.join(', ')}`);
         });
     </script>
 </body>
-</html>
+</html>       
